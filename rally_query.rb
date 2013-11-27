@@ -19,7 +19,7 @@ class Query
 		config[:workspace]  = workspace
 		config[:project]    = project
 		config[:username] = "Rohan.Dalvi@emc.com"
-		config[:password] = "Hr@ithi1k"
+		config[:password] = "password"
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
