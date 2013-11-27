@@ -1,6 +1,6 @@
 require 'logger'
 #require 'rally_api'
-require 'C:\Rally\common\setup'
+
 require './project.rb'
 require './artifact.rb'
 

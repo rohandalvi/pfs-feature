@@ -1,5 +1,5 @@
 
-require 'rally_api_emc_sso'
+require 'rally_api'
 
 class Query
 
@@ -12,13 +12,14 @@ class Query
 
 
 		workspace_name = workspace
-		project_name = project
+		@project_name = project
 
 
 		config = {:base_url => "https://rally1.rallydev.com/slm"}
-		config[:workspace]  = workspace_name
-		config[:project]    = project_name
-
+		config[:workspace]  = workspace
+		config[:project]    = project
+		config[:username] = "Rohan.Dalvi@emc.com"
+		config[:password] = "Hr@ithi1k"
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
@@ -28,7 +29,6 @@ class Query
 		@rally = RallyAPI::RallyRestJson.new(config) 
 	end
 	def build_query(type,fetch,string,order)
-  
 	   query = RallyAPI::RallyQuery.new()
 	   query.type = type
 	   query.fetch=fetch
@@ -39,10 +39,20 @@ class Query
 	   result = @rally.find(query);
 	   
 	   if(result.length>0)
+	   	puts "result found for #{query.query_string}"
 	     return result
 	   else
+	   	#puts "No result for #{@project_name}"
 	     #puts "No result"
 	   end  
+	end
+
+	def update(type,fields)
+		@rally.update(type,fields)
+	end
+
+	def get_rally_object
+		return @rally
 	end
 
 end

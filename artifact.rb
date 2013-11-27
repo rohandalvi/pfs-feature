@@ -9,13 +9,13 @@ class Artifact
 		@project =   @doc.elements['/pfs-scoping-automate/projects/project/rally-project'].text.strip
 		@workspace = @doc.elements['/pfs-scoping-automate/projects/project/rally-workspace'].text.strip
 		@logger = logger
-		@query = Query.new(@workspace,@project)
+		@query_result = Query.new(@workspace,@project)
 
 
 	end
 
 	def get_all_features_of_project(project,allowed)
-		result = @query.build_query("portfolioitem/feature","Name,State,FormattedID,Project,UserStories","((State.Name = \"#{allowed.strip}\") AND (Project.Name = \"#{project}\"))","FormattedID Asc")
+		result = @query_result.build_query("portfolioitem/feature","Name,State,FormattedID,Project,UserStories","((State.Name = \"#{allowed.strip}\") AND (Project.Name = \"#{project}\"))","FormattedID Asc")
 		if(result!=nil)
 			result.each do |res|
 				res.read
@@ -30,34 +30,37 @@ class Artifact
 	end
 
 	def process_stories_of_feature(epicStory,project)
-		result = @query.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,Children,Project","((ObjectID = \"#{epicStory}\") AND (Project.Name = \"#{project}\"))","")
+		#query1 = Query.new(@workspace,project)
+		@newproject = project
+		puts "epic story is #{epicStory} and project is #{project}"
+		result = @query_result.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,Children,Project","(ObjectID = \"#{epicStory}\")","ObjectID ASC")
 		if(result!=nil)
 			result.each do |res|
 				res.read
 				if res.Children.results!=nil
 					res.Children.results.each do |child_of_epic|
-						case child_of_epic
-						when isDataPath(child_of_epic)
-					#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstDP".strip)
+						if isDataPath(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstDP".strip)
 							@logger.info("Data path found for #{child_of_epic}")
-						when isControlPath(child_of_epic)
-							#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstCP".strip)
+						elsif isControlPath(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstCP".strip)
 							@logger.info("Control Path found for #{child_of_epic}")
-						when isPlatform(child_of_epic)
-							#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstPltfm".strip)
+						elsif isPlatform(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstPltfm".strip)
 							@logger.info("Platform found for #{child_of_epic}")
-						when isTestEstimate(child_of_epic)
-							#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstTest".strip)
+						elsif isTestEstimate(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstTest".strip)
 							@logger.info("Test estimate found for #{child_of_epic}")
-						when isPerformance(child_of_epic)
-							#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstPerformance".strip)
+						elsif isPerformance(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstPerformance".strip)
 							@logger.info("Performance found for #{child_of_epic}")
-						when isDoc(child_of_epic)
-							#get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstDoc".strip)
+						elsif isDoc(child_of_epic)
+							get_estimate_value(child_of_epic.ObjectID.to_s.strip,"c_EstDoc".strip)
 							@logger.info("DOC/IDD found for #{child_of_epic}")
 						end
 					end
-					#addup_total
+					puts "calling addup_total"
+					addup_total
 				end
 			end
 		end
@@ -107,7 +110,9 @@ class Artifact
 		update_total = {}
 		update_total["c_ExpScopingTotal"] = @total
 		if(@total>0)
-			update = @rally.update("portfolioitem","FormattedID|#{@feature_id}",update_total)
+			rally = @query_result.get_rally_object
+			puts "updating total to #{@total} and project #{@newproject}"
+			update = rally.update("portfolioitem","FormattedID|#{@feature_id}",update_total)
 			if(update)
 				@logger.info("Total for #{@feature_id} is updated to #{@total}")
 			else
@@ -118,7 +123,7 @@ class Artifact
 	end
 
 	def get_estimate_value(name,switch)
-		result = @query.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,#{switch},PlanEstimate","(ObjectID = \"#{name}\")","")
+		result = @query_result.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,#{switch},PlanEstimate","(ObjectID = \"#{name}\")","")
 		if(result!=nil)
 			result.each do |res| 
 				if(res["PlanEstimate"]==nil)
@@ -150,7 +155,8 @@ class Artifact
 
 	def get_total
 		@total = 0
-		result = @query.build_query("portfolioitem/feature","c_ExpScopingCP,c_ExpScopingDP,c_ExpScopingPlatform,c_ExpScopingTest,c_ExpScopingPerf,c_ExpScopingDoc","(FormattedID = #{@feature_id})","")
+		result = @query_result.build_query("portfolioitem/feature","c_ExpScopingCP,c_ExpScopingDP,c_ExpScopingPlatform,c_ExpScopingTest,c_ExpScopingPerf,c_ExpScopingDoc","(FormattedID = #{@feature_id})","")
+		puts "getting total for #{@feature_id}"
 		if(result!=nil)
 			result.each do |res| 
 				@total = res["c_ExpScopingCP"].to_i
@@ -166,10 +172,10 @@ class Artifact
 	def update(value,variable)
 		update_fields = {}
 		update_fields[variable]=value
-
-		updated = @rally.update("portfolioitem","FormattedID|#{@feature_id}",update_fields)
+		rally = @query_result.get_rally_object
+		updated = rally.update("portfolioitem","FormattedID|#{@feature_id}",update_fields)
 		if updated
-			@rally.delete(@story_ref)
+			rally.delete(@story_ref)
 			@logger.info("#{@story_ref} deleted")
 		else
 			@logger.info("Could not update #{value} for #{variable}")
