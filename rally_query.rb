@@ -55,4 +55,8 @@ class Query
 		return @rally
 	end
 
+<<<<<<< HEAD
 end
+=======
+end
+>>>>>>> 06a783e6421e07dc00bb3622ea87df66371b8968
