@@ -1,5 +1,5 @@
 require 'logger'
-require 'rally_api'
+require 'rally_api_emc_sso'
 require 'date'
 require 'rally_query.rb'
 
@@ -69,7 +69,7 @@ class RallyProject
 =end
   def find_PI_feature_by_state( state )
     log_debug( "find_PI_feature_by_state Start" ) 
-    query_result = @query.build_query("portfolioitem/feature","State,Name,DirectChildrenCount","((State.Name = \"#{state}\") AND (DirectChildrenCount = 0))")
+    query_result = @query.build_query("portfolioitem/feature","State,Name,DirectChildrenCount","((State.Name = \"#{state}\") AND (DirectChildrenCount = 0))","")
     
     if query_result != nil && query_result.count != 0
       log_debug( "found PI results: " + query_result.count.to_s )
@@ -374,7 +374,7 @@ parameters: a_task_name -> type string, a_story -> story object
   returning: nothing/ deleting "a_tag" from "artifact.tags" set.
 =end
   def remove_tag(artifact, a_tag)
-    log_debug( "RallyProject::remove_tag( " + a_tag + ") Start" )
+    log_debug("RallyProject::remove_tag( " + a_tag + ") Start ")
     if nil == artifact.tags 
       log_debug( "remove_tag error: No story provided" )
     else
@@ -439,17 +439,27 @@ parameters: a_task_name -> type string, a_story -> story object
     log_debug("RallyProject::add_tag(#{a_tag}) Start ")
     update_tags(artifact,tags)
   end
-
+  def get_fid(artifact)
+    result = @query.build_query(artifact,"Name,FormattedID,ObjectID","(ObjectID = \"#{artifact.ObjectID}\")","")
+    return result.first.FormattedID
+      
+  end
   def update_tags(artifact, tags)
     puts "In update_tags \n"
     if tags
       tagfields = {}
       tagfields[:tags] = gather_tags(tags)
-      puts "Tagging #{artifact.name} with Tags:#{tagfields[:tags].length}\n"
+      puts "Artifact: #{artifact.FormattedID}, Tagging #{artifact.name} with Tags:#{tagfields[:tags].length}\n"
+      if tagfields!=nil
       tagfields[:tags].each {|tag|
         puts "Tag: #{tag.name}\n"
+        tagfields["Tags"] = tag._ref
+        
+        @query.get_rally_object.update(artifact._type,"FormattedID|#{get_fid(artifact)}",tagfields)
         }
-        artifact.update(tagfields)
+        #@query.get_rally_object.update(artifact._type)
+        #artifact.update(tagfields)
+      end
     end
   end
 =begin

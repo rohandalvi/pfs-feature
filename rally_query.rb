@@ -1,5 +1,5 @@
 
-require 'rally_api'
+require 'rally_api_emc_sso'
 
 class Query
 
@@ -11,15 +11,14 @@ class Query
 		headers.version = "1.0"
 
 
-		workspace_name = workspace
+		@workspace_name = workspace
 		@project_name = project
 
 
 		config = {:base_url => "https://rally1.rallydev.com/slm"}
 		config[:workspace]  = workspace
 		config[:project]    = project
-		config[:username] = "Rohan.Dalvi@emc.com"
-		config[:password] = "password"
+
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
@@ -54,9 +53,5 @@ class Query
 	def get_rally_object
 		return @rally
 	end
+end
 
-<<<<<<< HEAD
-end
-=======
-end
->>>>>>> 06a783e6421e07dc00bb3622ea87df66371b8968
