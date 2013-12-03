@@ -18,7 +18,7 @@ class Automaton
       rp = RallyProject.new(project.elements["rally-workspace"].text.strip,project.elements["rally-project"].text.strip,@logger)
       
                 
-      rp.log_info( "Processing project: " + rp.get_project.name + ", workspace: " +  rp.get_workspace.name )
+      rp.log_info( "Processing project: " + rp.get_project(project.elements["rally-project"].text.strip) + ", workspace: " +  rp.get_workspace(project.elements["rally-workspace"].text.strip) )
       #Find any story with the needed trigger
       #Find the right US based on some query
       #Do we need project here?  Need it for creation, but for search?

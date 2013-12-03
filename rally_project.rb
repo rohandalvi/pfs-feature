@@ -1,7 +1,7 @@
 require 'logger'
 require 'rally_api'
 require 'date'
-require './rally_query.rb'
+require 'rally_query.rb'
 
 class RallyProject
   def initialize(workspace,project,logger)
@@ -98,6 +98,22 @@ returning: entire query_result which may contain one or more portfolio items.
     log_debug( "find_portfolio_item_by_tag End" )
     return query_result    
   end
+
+  def find_portfolio_item_by_tag_sub(trigger_tag)
+    log_debug( "find_portfolio_item_by_tag_sub Start" )
+    
+    query_result = @query.build_query("portfolioitem","FormattedID,Tags,Name","(Tags.Name = \"#{trigger_tag}\")","")
+    if query_result!=nil
+      log_debug("Found parent count: #{query_result.count}, first story: #{query_result.results.first.FormattedID} ")
+    else
+      log_debug("no PI parent found")
+    end
+    
+    log_debug("find_portfolio_item_by_tag_sub End ")
+    return query_result
+  end
+
+
 =begin
 Function name: find_workspace
 parameter: name -> type string
@@ -227,6 +243,34 @@ returning: newly created user story as "result_story"
     log_debug("create_story end")
     return result_story
   end
+
+  def create_story_with_portfolio_item_parent( a_story_name, a_parent, a_project)
+    log_debug("create_story_with_portfolio_item_parent start")
+    result_story = nil
+    
+    #If children exist with the name, don't create them
+    if child_exists(a_story_name,a_parent)
+      log_info("Child #{a_story_name} exists -- skipping")
+      return nil
+    else
+      log_info("Processing child #{a_story_name}")
+    end
+    log_info( "Creating story: #{a_story_name.class} ,Project: #{a_project.to_s},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")
+    fields = {}
+    fields["Name"]=a_story_name
+    fields["Project"] = a_project._ref
+    fields["PortfolioItem"] = a_parent._ref
+    
+    @query.get_rally_object.create(:hierarchicalrequirement,fields) do |user_story|
+      story_id = user_story.FormattedID
+      log_info("New story created: #{user_story.FormattedID}")
+      log_info("Parent: #{a_parent.FormattedID}")
+      log_info("Project Name: #{a_project}")
+      result_story = user_story
+    end
+    log_debug("_with_portfolio_item_parent end")
+    return result_story
+  end
   
   #this function may fail if there are duplicate stories with the same name or if the name has any "/ or \"
   # a quick fix would be to query based on the objectid and not on the name
@@ -236,7 +280,7 @@ parameter: story -> type string, parent -> type string
 returning: true, if a parent has any children with name in story, false otherwise.  
 =end  
   def child_exists(story,parent)
-    result = @query.build_query(:hierarchicalrequirement,"Name,FormattedID,ObjectID,Children","(Name = #{parent})")
+    result = @query.build_query(:hierarchicalrequirement,"Name,FormattedID,ObjectID,Children","(Name = \"#{parent}\")","")
     if(result==nil)
       return false
     else
