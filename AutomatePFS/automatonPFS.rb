@@ -53,7 +53,7 @@ class Automaton
                 rp.create_task_on_story( task.text.strip, result_story )
               end
             else
-              p.log_info "No new result_story_id"
+              rp.log_info "No new result_story_id"
             end
           end
 

@@ -12,9 +12,9 @@ class RallyProject
     log_debug( "RallyProject::initialize Start: " + workspace + ", project: " + project)
   end
 =begin
-Function name: get_workspace
-parameters: workspace_name -> type string
-returning: workspace reference  
+  Function name: get_workspace
+  parameters: workspace_name -> type string
+  returning: workspace reference  
 =end
   def get_workspace(workspace_name)
     #return workspace_ref
@@ -45,9 +45,9 @@ returning: workspace reference
     return project_ref
   end
 =begin
-Function Name: find_story_by_tag
-parameter: trigger_tag -> type string
-returning: 1 or more stories set as 'result' 
+  Function Name: find_story_by_tag
+  parameter: trigger_tag -> type string
+  returning: 1 or more stories set as 'result' 
 =end
   
   def find_story_by_tag(trigger_tag)
@@ -63,9 +63,9 @@ returning: 1 or more stories set as 'result'
     return result
   end
 =begin
-Function Name: find_PI_feature_by_state
-parameter: state -> type string
-returning: entire query_result which may contain one more features
+  Function Name: find_PI_feature_by_state
+  parameter: state -> type string
+  returning: entire query_result which may contain one more features
 =end
   def find_PI_feature_by_state( state )
     log_debug( "find_PI_feature_by_state Start" ) 
@@ -82,9 +82,9 @@ returning: entire query_result which may contain one more features
     
   end 
 =begin
-Function name: find_portfolio_item_by_tag
-parameter: trigger_tag => type string
-returning: entire query_result which may contain one or more portfolio items.  
+  Function name: find_portfolio_item_by_tag
+  parameter: trigger_tag => type string
+  returning: entire query_result which may contain one or more portfolio items.  
 =end
   def find_portfolio_item_by_tag( trigger_tag )#here trigger_tag should be a string
     log_debug( "find_portfolio_item_by_tag Start" )
@@ -115,27 +115,31 @@ returning: entire query_result which may contain one or more portfolio items.
 
 
 =begin
-Function name: find_workspace
-parameter: name -> type string
-returning: first set of Workspace containing Name, ObjectID, _ref  
+  Function name: find_workspace
+  parameter: name -> type string
+  returning: first set of Workspace containing Name, ObjectID, _ref  
 =end
   def find_workspace(name)#here name should be a string
      result = @query.build_query(:workspace,"Name","(Name = \"#{name}\")","")
-     return result.first  
+     if(result!=nil)
+      return result.first
+     else
+       log_debug("No project #{name} found")
+     end  
   end
 =begin
-Function name: find_project
-parameter: name -> type string
-returning: first set of Project containing Name, ObjectID, _ref  
+  Function name: find_project
+  parameter: name -> type string
+  returning: first set of Project containing Name, ObjectID, _ref  
 =end
   def find_project(name) #here name should be a string
     result = @query.build_query(:project,"Name,Owner","(Name = \"#{name}\")","")
     return result.first
   end
 =begin
-Function name: find_project_owner
-parameter: name -> type string
-returning: first set of Project with Name,Owner,ObjectID 
+  Function name: find_project_owner
+  parameter: name -> type string
+  returning: first set of Project with Name,Owner,ObjectID 
 =end
   def find_project_owner(name) #here name should be a string
     result = @query.build_query(:project,"Name,Owner,ObjectID","(Name = \"#{name}\")","")
@@ -150,9 +154,9 @@ returning: first set of Project with Name,Owner,ObjectID
     return nil
   end
 =begin
-Function name: find_changeset
-parameter: revision -> type string
-returning: first set of changeset with Revision  
+  Function name: find_changeset
+  parameter: revision -> type string
+  returning: first set of changeset with Revision  
 =end
   def find_changeset(rev)
     result = @query.build_query(:changeset, "Revision","(Revision = \"#{rev}\")","")
@@ -162,11 +166,11 @@ returning: first set of changeset with Revision
     return nil
   end
 =begin
-Function name: find_objects_by_name
-parameter: type, name -> type string
-returning: entire result
-
-comments: Duplicates are highly likely here, for ex: type = HierarchicalRequirement, name = "Some duplicate story name"  
+  Function name: find_objects_by_name
+  parameter: type, name -> type string
+  returning: entire result
+  
+  comments: Duplicates are highly likely here, for ex: type = HierarchicalRequirement, name = "Some duplicate story name"  
 =end
   def find_objects_by_name(type,name)
      if name!="" && name!=nil
@@ -178,9 +182,9 @@ comments: Duplicates are highly likely here, for ex: type = HierarchicalRequirem
      end
   end
 =begin
-Function name: find_story_by_id
-parameters: story_id (formattedID)
-returning: first set of story matching FormattedID
+  Function name: find_story_by_id
+  parameters: story_id (formattedID)
+  returning: first set of story matching FormattedID
 =end
   def find_story_by_id(story_id)
     if story_id!="" && story_id!=nil
@@ -189,9 +193,9 @@ returning: first set of story matching FormattedID
     end
   end
 =begin
-Function name: find_or_create_build_definition
-parameters: def_name -> type string
-returning: nil/nothing to return  
+  Function name: find_or_create_build_definition
+  parameters: def_name -> type string
+  returning: nil/nothing to return  
 =end
   def find_or_create_build_definition(def_name)
     log_debug("Looking for build definition #{def_name}")
@@ -213,9 +217,9 @@ returning: nil/nothing to return
     end
   end
 =begin
-Function name: create_story
-parameters: story_name -> type string, story_parent -> type string
-returning: newly created user story as "result_story"   
+  Function name: create_story
+  parameters: story_name -> type string, story_parent -> type string
+  returning: newly created user story as "result_story"   
 =end
   def create_story(story_name,story_parent)
    log_debug("Create story start")
@@ -255,19 +259,12 @@ returning: newly created user story as "result_story"
     else
       log_info("Processing child #{a_story_name}")
     end
-    log_info( "Creating story: #{a_story_name.class} ,Project: #{a_project.to_s},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")
+    log_info( "Creating story: #{a_story_name} ,Project: #{a_project._ref},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")
     fields = {}
     fields["Name"]=a_story_name
-    fields["Project"] = a_project._ref
-    fields["PortfolioItem"] = a_parent._ref
     
-    @query.get_rally_object.create(:hierarchicalrequirement,fields) do |user_story|
-      story_id = user_story.FormattedID
-      log_info("New story created: #{user_story.FormattedID}")
-      log_info("Parent: #{a_parent.FormattedID}")
-      log_info("Project Name: #{a_project}")
-      result_story = user_story
-    end
+    rally = @query.get_rally_object
+   #rally.create(:hierarchicalrequirement,fields) 
     log_debug("_with_portfolio_item_parent end")
     return result_story
   end
@@ -275,11 +272,13 @@ returning: newly created user story as "result_story"
   #this function may fail if there are duplicate stories with the same name or if the name has any "/ or \"
   # a quick fix would be to query based on the objectid and not on the name
 =begin
-Function name: child_exists
-parameter: story -> type string, parent -> type string
-returning: true, if a parent has any children with name in story, false otherwise.  
+  Function name: child_exists
+  parameter: story -> type string, parent -> type string
+  returning: true, if a parent has any children with name in story, false otherwise.  
 =end  
   def child_exists(story,parent)
+    log_info("Inside child exists for: ")
+    log_info("Story: #{story} & Parent: #{parent}")
     result = @query.build_query(:hierarchicalrequirement,"Name,FormattedID,ObjectID,Children","(Name = \"#{parent}\")","")
     if(result==nil)
       return false
@@ -325,31 +324,30 @@ parameters: a_task_name -> type string, a_story -> story object
     end
   end
 =begin
-Function name: create_task 
-parameters: a_task_name -> type string, a_story_id -> FormattedID of story.
-returning: nothing/creating a task on story.
+  Function name: create_task 
+  parameters: a_task_name -> type string, a_story_id -> FormattedID of story.
+  returning: nothing/creating a task on story.
 =end
   def create_task(a_task_name,a_story_id)
     log_info("Creating a task: #{a_task_name}, for user story: #{a_story_id} \n")
     user_story = find_story_by_id(a_story_id)
-    
+
     log_info("Found Story: #{user_story.FormattedID}")
     create_task_on_story(a_task_name,user_story)
-    
   end
 =begin
-Function name: create_build
-parameters: 
-1. build_defs -> _ref of build_definition/ build_definition object
-2. changesets -> _ref of changesets / changesets object
-3. duration -> type string
-4. message -> type string
-5. number -> type number
-6. start -> type date
-7. status -> type string
-8. uri -> type uri
-
-returning: nothing/creating a build out of given arguments
+  Function name: create_build
+  parameters: 
+  1. build_defs -> _ref of build_definition/ build_definition object
+  2. changesets -> _ref of changesets / changesets object
+  3. duration -> type string
+  4. message -> type string
+  5. number -> type number
+  6. start -> type date
+  7. status -> type string
+  8. uri -> type uri
+  
+  returning: nothing/creating a build out of given arguments
 =end
   def create_build(build_defs,changesets,duration,message,number,start,status,uri)
     log_debug("Creating build")
@@ -371,13 +369,13 @@ returning: nothing/creating a build out of given arguments
   end
   #given a story and a tag, remove tag
 =begin
-Function name: remove_tag
-parameters: artifact -> type rally object, a_tag -> type string
-returning: nothing/ deleting "a_tag" from "artifact.tags" set.
+  Function name: remove_tag
+  parameters: artifact -> type rally object, a_tag -> type string
+  returning: nothing/ deleting "a_tag" from "artifact.tags" set.
 =end
   def remove_tag(artifact, a_tag)
     log_debug( "RallyProject::remove_tag( " + a_tag + ") Start" )
-    if nil == artifact
+    if nil == artifact.tags 
       log_debug( "remove_tag error: No story provided" )
     else
       tags_set = artifact.tags
@@ -393,9 +391,9 @@ returning: nothing/ deleting "a_tag" from "artifact.tags" set.
     
   end #end of remove_tag
 =begin
-Function name: find_tag
-parameters: tag_name -> type string  
-returning: first tag object (if pre-existing), creating a new tag otherwise
+  Function name: find_tag
+  parameters: tag_name -> type string  
+  returning: first tag object (if pre-existing), creating a new tag otherwise
 =end
   def find_tag(tag_name)
     if(tag_name != "" and tag_name !=nil)
@@ -409,9 +407,9 @@ returning: first tag object (if pre-existing), creating a new tag otherwise
     end
   end
 =begin
-Function name: gather_tags
-parameters: tagnames -> type string
-returning: Array of tag objects  
+  Function name: gather_tags
+  parameters: tagnames -> type string
+  returning: Array of tag objects  
 =end
   def gather_tags(tagnames)
     if(!tagnames)
@@ -425,9 +423,9 @@ returning: Array of tag objects
     return tags   
   end
 =begin
-Function name: add_tag
-parameters: artifact -> Rally object containing tags, a_tag -> tag to be added to artifact
-returning: nothing/ updating artifact by adding new tag.
+  Function name: add_tag
+  parameters: artifact -> Rally object containing tags, a_tag -> tag to be added to artifact
+  returning: nothing/ updating artifact by adding new tag.
 =end 
   def add_tag(artifact,a_tag)
     
@@ -455,9 +453,9 @@ returning: nothing/ updating artifact by adding new tag.
     end
   end
 =begin
-Function name: update_name
-parameters: artifact -> type object, a_name -> type string
-returning: nothing/updating artifact with a new name  
+  Function name: update_name
+  parameters: artifact -> type object, a_name -> type string
+  returning: nothing/updating artifact with a new name  
 =end
   def update_name(artifact,a_name)
     @query.get_rally_object.update(artifact,{"Name" => a_name})
@@ -465,9 +463,9 @@ returning: nothing/updating artifact with a new name
   
   #create an array of rally changesets based on changeset id's from Bamboo
 =begin
-Function name: find_changesets
-parameters: changeset_ids -> type revision object
-returning: Collection containing all changeset objects
+  Function name: find_changesets
+  parameters: changeset_ids -> type revision object
+  returning: Collection containing all changeset objects
 =end
   def find_changesets(changeset_ids)
     sets = Array.new
