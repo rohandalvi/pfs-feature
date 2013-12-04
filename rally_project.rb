@@ -259,12 +259,14 @@ class RallyProject
     else
       log_info("Processing child #{a_story_name}")
     end
-    log_info( "Creating story: #{a_story_name} ,Project: #{a_project._ref},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")
+    log_info( "Creating story: #{a_story_name} ,Project: #{a_project._ref},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")   
     fields = {}
     fields["Name"]=a_story_name
     fields["Project"] = a_project
     fields["PortfolioItem"] = a_parent
-    fields["Owner"] = a_project.Owner.Name
+    if(find_project_owner(a_project).Owner.Name!=nil)
+      fields["Owner"] = a_project.Owner.Name
+    end
     @query.get_rally_object.create(:hierarchicalrequirement,fields) do |user_story|
       log_info("New story created: #{user_story.FormattedID}")
       log_info("Parent: #{a_parent.FormattedID}")
