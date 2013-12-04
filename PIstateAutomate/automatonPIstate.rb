@@ -45,7 +45,7 @@ class Automaton
 							puts "Needed tag: #{@needed_tag}"
 							rp.add_tag( res, @needed_tag )
 						else
-							i = tags_set.index{|x|x.to_s==@needed_tag}
+							i = tags_set.index{|x|  x.to_s==@needed_tag}
 							if( nil == i )
 								rp.log_debug( "About add a tag to: #{res.FormattedID}")
 								rp.add_tag( res, @needed_tag )

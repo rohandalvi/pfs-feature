@@ -69,10 +69,10 @@ class RallyProject
 =end
   def find_PI_feature_by_state( state )
     log_debug( "find_PI_feature_by_state Start" ) 
-    query_result = @query.build_query("portfolioitem/feature","State,Name,DirectChildrenCount","((State.Name = \"#{state}\") AND (DirectChildrenCount = 0))","")
+    query_result = @query.build_query("portfolioitem/feature","FormattedID,State,Name,DirectChildrenCount","((State.Name = \"#{state}\") AND (DirectChildrenCount = 0))","")
     
     if query_result != nil && query_result.count != 0
-      log_debug( "found PI results: " + query_result.count.to_s )
+      log_debug( "found PI results: " + query_result.results.count.to_s )
     else
       log_debug( "no PI feature found" )
     end
@@ -103,8 +103,8 @@ class RallyProject
     log_debug( "find_portfolio_item_by_tag_sub Start" )
     
     query_result = @query.build_query("portfolioitem","FormattedID,Tags,Name","(Tags.Name = \"#{trigger_tag}\")","")
-    if query_result!=nil
-      log_debug("Found parent count: #{query_result.count}, first story: #{query_result.results.first.FormattedID} ")
+    if query_result!=nil && query_result.results.count!=0
+      log_debug("Found parent count: #{query_result.results.count}, first story: #{query_result.results.first.FormattedID} ")
     else
       log_debug("no PI parent found")
     end
@@ -262,9 +262,17 @@ class RallyProject
     log_info( "Creating story: #{a_story_name} ,Project: #{a_project._ref},  for parent: #{a_parent.class}, Owner: #{find_project_owner(a_project.to_s)}, PortfolioItem: #{a_parent._ref}, Project: #{a_project._ref} and class #{a_project.class}")
     fields = {}
     fields["Name"]=a_story_name
-    
-    rally = @query.get_rally_object
-   #rally.create(:hierarchicalrequirement,fields) 
+    fields["Project"] = a_project
+    fields["PortfolioItem"] = a_parent
+    fields["Owner"] = a_project.Owner.Name
+    @query.get_rally_object.create(:hierarchicalrequirement,fields) do |user_story|
+      log_info("New story created: #{user_story.FormattedID}")
+      log_info("Parent: #{a_parent.FormattedID}")
+      log_info("Project Name: #{a_project.Name}")
+      log_info("Project Owner: #{a_project.Owner.Name}")
+      
+      result_story = user_story
+    end 
     log_debug("_with_portfolio_item_parent end")
     return result_story
   end
@@ -384,7 +392,7 @@ parameters: a_task_name -> type string, a_story -> story object
           tags_set.delete(tag)
           @query.get_rally_object.update(artifact,:tags=>tags_set)  
         end #end of if
-        
+
       end #end of do
       
     end #end of else
@@ -441,26 +449,50 @@ parameters: a_task_name -> type string, a_story -> story object
   end
   def get_fid(artifact)
     result = @query.build_query(artifact,"Name,FormattedID,ObjectID","(ObjectID = \"#{artifact.ObjectID}\")","")
+    puts "Returning: #{result.first.FormattedID}"
     return result.first.FormattedID
       
   end
+  def exists(artifact)
+    result = @query.build_query(artifact._type,"Name,FormattedID","(FormattedID = \"#{artifact.FormattedID}\")","")
+    if result!=nil
+      return true
+    else
+      return false
+    end
+  end
   def update_tags(artifact, tags)
     puts "In update_tags \n"
-    if tags
-      tagfields = {}
-      tagfields[:tags] = gather_tags(tags)
-      puts "Artifact: #{artifact.FormattedID}, Tagging #{artifact.name} with Tags:#{tagfields[:tags].length}\n"
-      if tagfields!=nil
-      tagfields[:tags].each {|tag|
-        puts "Tag: #{tag.name}\n"
-        tagfields["Tags"] = tag._ref
-        
-        @query.get_rally_object.update(artifact._type,"FormattedID|#{get_fid(artifact)}",tagfields)
-        }
-        #@query.get_rally_object.update(artifact._type)
-        #artifact.update(tagfields)
+    if exists(artifact)
+      puts "Artifact exists"
+      if tags
+        tagfields = {}
+        tagfields[:tags] = gather_tags(tags)
+        puts "Artifact: #{artifact.FormattedID}, Tagging #{artifact.name} with Tags:#{tagfields[:tags].first._ref}\n"
+        puts "Workspace: #{@workspace}"
+
+         if tagfields[:tags]!=nil
+          
+          tagfields[:tags].each {|tag|
+            fields = {
+              "Tags" => tag
+            }
+
+            puts "Tag: #{tag._ref}\n"
+            puts "FormattedID: #{fields}"
+            
+            
+            @query.get_rally_object.update(artifact._type,"FormattedID|#{artifact.FormattedID}",fields)
+            puts "Updated #{fields}"
+          }
+         
+        end
       end
+    else
+      puts "Aborting"
+      exit
     end
+    
   end
 =begin
   Function name: update_name

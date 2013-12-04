@@ -23,7 +23,7 @@ class Query
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
 
-		config[:version] = "v2.0"
+		#config[:version] = "v2.0"
 
 		@rally = RallyAPI::RallyRestJson.new(config) 
 	end
