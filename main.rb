@@ -21,7 +21,7 @@ class Main
       cmd = "AutomatePFS"
       cmd2 = "ruby rally_PFS_automate.rb #{ARGV[0].strip}"
     when "PFSFeature.xml"
-      cmd2 = "ruby main_script.rb #{ARGV[0].strip}"
+      cmd2 = "ruby pfs_feature_automate.rb #{ARGV[0].strip}"
     else
       puts "Please enter a valid argument"
       usage
