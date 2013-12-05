@@ -1,5 +1,5 @@
 require 'logger'
-require 'rally_api_emc_sso'
+#require 'rally_api_emc_sso'
 require 'date'
 require 'rally_query.rb'
 
