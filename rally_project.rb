@@ -4,8 +4,8 @@ require 'date'
 require 'rally_query.rb'
 
 class RallyProject
-  def initialize(workspace,project,logger)
-    @query = Query.new(workspace,project)
+  def initialize(workspace,project,logger,doc)
+    @query = Query.new(workspace,project,doc)
     @logger=logger
     @workspace = workspace
     @project = project

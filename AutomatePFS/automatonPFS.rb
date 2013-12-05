@@ -15,7 +15,7 @@ class Automaton
   def process
     print( "Automaton::Process Start" )
     @doc.elements.each('/pfs-rally-automate/projects/project') do |project|
-      rp = RallyProject.new(project.elements["rally-workspace"].text.strip,project.elements["rally-project"].text.strip,@logger)
+      rp = RallyProject.new(project.elements["rally-workspace"].text.strip,project.elements["rally-project"].text.strip,@logger,@doc)
       
                 
       rp.log_info( "Processing project: " + rp.get_project(project.elements["rally-project"].text.strip) + ", workspace: " +  rp.get_workspace(project.elements["rally-workspace"].text.strip) )

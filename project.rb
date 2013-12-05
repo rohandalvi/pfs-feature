@@ -15,7 +15,7 @@ class Project
 		@parent_array = Array.new
 		@child_array = Array.new
 		@flag = true
-		@query = Query.new(workspace,project)
+		@query = Query.new(workspace,project,doc)
 
 		
 	end

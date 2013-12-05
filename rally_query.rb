@@ -3,7 +3,7 @@ require 'rally_api_emc_sso'
 
 class Query
 
-	def initialize(workspace,project)
+	def initialize(workspace,project,doc)
 
 		headers = RallyAPI::CustomHttpHeader.new()
 		headers.name = "My Utility"
