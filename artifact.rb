@@ -21,9 +21,11 @@ class Artifact
 				res.read
 				@feature_id = res.FormattedID
 				if(res.UserStories.results.length>0)
-					res.UserStories.results.each do |epic_story|
-						process_stories_of_feature(epic_story.ObjectID.to_s.strip,project.to_s.strip)
-					end
+				  @logger.info(res.UserStories.results.inspect)
+					res.UserStories.results.each {|story|
+					  @logger.info("ObjectID of epic_story is #{story.ObjectID} for feature id: #{@feature_id}")
+						process_stories_of_feature(story.ObjectID.to_s.strip,project.to_s.strip)
+					}
 				end
 			end
 		end
@@ -33,7 +35,7 @@ class Artifact
 		#query1 = Query.new(@workspace,project)
 		@newproject = project
 		puts "epic story is #{epicStory} and project is #{project}"
-		result = @query_result.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,Children,Project","(ObjectID = \"#{epicStory}\")","ObjectID ASC")
+		result = @query_result.build_query("hierarchicalrequirement","Name,ObjectID,FormattedID,Children,Project","(ObjectID = \"#{epicStory}\")","")
 		if(result!=nil)
 			result.each do |res|
 				res.read

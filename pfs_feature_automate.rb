@@ -1,9 +1,10 @@
 #require './connect.rb'
-require 'rufus-scheduler'
+require 'openwfe/util/scheduler'
 require 'rubygems'
 require 'logger'
 require 'rexml/document'
 require './automaton.rb'
+include OpenWFE
 #require './rally_query.rb'
 def setup_logger(doc) 
 	puts "Setting up logger"
@@ -51,8 +52,8 @@ if(ARGV.count != 1)
 end
 
 
-scheduler = Rufus::Scheduler.new
-scheduler.every '2h' do
+scheduler = Scheduler.new
+scheduler.start
 
 ARGV.each do |arg|
 	if  File::exists?( arg )
@@ -65,5 +66,5 @@ ARGV.each do |arg|
 		puts "#{arg} not found!"
 	end
 end
-end
+
 scheduler.join

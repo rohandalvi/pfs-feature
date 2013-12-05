@@ -19,6 +19,7 @@ class Query
 		config[:workspace]  = workspace
 		config[:project]    = project
 
+    config[:version] = "v2.0"
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
