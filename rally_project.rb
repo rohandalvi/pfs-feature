@@ -264,7 +264,7 @@ class RallyProject
     fields["Name"]=a_story_name
     fields["Project"] = a_project
     fields["PortfolioItem"] = a_parent
-    if(find_project_owner(a_project).Owner.Name!=nil)
+    if(find_project_owner(a_project)!=nil)
       fields["Owner"] = a_project.Owner.Name
     end
     @query.get_rally_object.create(:hierarchicalrequirement,fields) do |user_story|

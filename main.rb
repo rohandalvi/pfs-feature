@@ -16,19 +16,22 @@ class Main
     when "PIstates.xml"
       cmd = 'PIstateAutomate'
       cmd2 = "ruby rally_PIstates_automate.rb #{ARGV[0].strip}"
-      
+      Dir.chdir(cmd)
+      system(cmd2)
     when "PFSAutomate.xml"
       cmd = "AutomatePFS"
       cmd2 = "ruby rally_PFS_automate.rb #{ARGV[0].strip}"
+      Dir.chdir(cmd)
+      system(cmd2)
     when "PFSFeature.xml"
       cmd2 = "ruby pfs_feature_automate.rb #{ARGV[0].strip}"
+      system(cmd2)
     else
       puts "Please enter a valid argument"
       usage
       exit
     end
-    cmd!=""?Dir.chdir(cmd):
-    system(cmd2)
+    
   end
   def usage
     puts "Usage: ruby #{__FILE__} <optional_xml>"
