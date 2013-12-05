@@ -23,8 +23,6 @@ class Query
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
     
-    puts "WSAPI version: #{config[:version]}"
-		#config[:version] = "v2.0"
 
 		@rally = RallyAPI::RallyRestJson.new(config) 
 	end
