@@ -9,7 +9,7 @@ class Artifact
 		@project =   @doc.elements['/pfs-scoping-automate/projects/project/rally-project'].text.strip
 		@workspace = @doc.elements['/pfs-scoping-automate/projects/project/rally-workspace'].text.strip
 		@logger = logger
-		@query_result = Query.new(@workspace,@project)
+		@query_result = Query.new(@workspace,@project,@doc)
 
 
 	end

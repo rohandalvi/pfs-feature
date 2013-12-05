@@ -18,12 +18,12 @@ class Query
 		config = {:base_url => "https://rally1.rallydev.com/slm"}
 		config[:workspace]  = workspace
 		config[:project]    = project
-
-    config[:version] = "v2.0"
+    config[:version] = doc.elements['//service/version']?doc.elements['//service/version'].text.strip: nil
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
-
+    
+    puts "WSAPI version: #{config[:version]}"
 		#config[:version] = "v2.0"
 
 		@rally = RallyAPI::RallyRestJson.new(config) 
