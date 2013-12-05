@@ -1,4 +1,3 @@
-
 require 'rally_api_emc_sso'
 
 class Query
@@ -18,7 +17,7 @@ class Query
 		config = {:base_url => "https://rally1.rallydev.com/slm"}
 		config[:workspace]  = workspace
 		config[:project]    = project
-    config[:version] = doc.elements['//service/version']?doc.elements['//service/version'].text.strip: nil
+                config[:version] = doc.elements['//service/version']?doc.elements['//service/version'].text.strip: nil
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
