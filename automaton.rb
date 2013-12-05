@@ -15,11 +15,8 @@ class Automaton
 		@project_name =   @doc.elements['/pfs-scoping-automate/projects/project/rally-project'].text.strip                   
 		@rally_url      = @doc.elements['/pfs-scoping-automate/rally/server'].text.strip
 		@workspace_name = @doc.elements['/pfs-scoping-automate/projects/project/rally-workspace'].text.strip
-#		@user_name      = @doc.elements['/PIstates-rally-automate/rally/user'].text.strip
-#		@password  		= @doc.elements['/PIstates-rally-automate/rally/password'].text.strip
-		# check passwords for obfuscation
-		
-		#get_creds
+
+
 		
 	end
 	def process
