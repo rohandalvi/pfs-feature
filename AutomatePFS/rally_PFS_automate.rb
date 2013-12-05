@@ -40,7 +40,7 @@ end
 # start the scheduler
 scheduler = Scheduler.new
 scheduler.start
-#log_debug ("Scheduler Start...")
+
 
 # process command line args
 ARGV.each do |arg|
@@ -54,5 +54,4 @@ ARGV.each do |arg|
 		p "#{arg} not found!"
 	end
 end
-#log_debug ("Scheduler Join...")
 scheduler.join
