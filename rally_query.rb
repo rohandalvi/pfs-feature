@@ -1,23 +1,35 @@
-require 'rally_api_emc_sso'
 
+require 'rally_api' 
+require 'bcrypt'
+#change this to SSO if you do not wish to enter your username & password in this file.
+
+#If you are using rally_api, ensure that you have added your username & password in the config below.
+
+#If you use SSO, there are chances that this script will break because of 401 error from Rally.
+#Better use rally_api if you have access directly.
 class Query
 
 	def initialize(workspace,project,doc)
 
 		headers = RallyAPI::CustomHttpHeader.new()
-		headers.name = "My Utility"
-		headers.vendor = "MyCompany"
+		headers.name = "Portfolio Management Automation"
+		headers.vendor = "EMC"
 		headers.version = "1.0"
 
 
 		@workspace_name = workspace
 		@project_name = project
-
+		file = File.new("../password.txt","r")
+		password = file.gets
+		my_password = BCrypt::Password.create(password.strip)
+		
 
 		config = {:base_url => "https://rally1.rallydev.com/slm"}
 		config[:workspace]  = workspace
 		config[:project]    = project
-                config[:version] = doc.elements['//service/version']?doc.elements['//service/version'].text.strip: nil
+		config[:username] = "rohan.dalvi@emc.com"
+		config[:password] = password.strip
+    	config[:version] = doc.elements['//service/version']?doc.elements['//service/version'].text.strip: nil
 		config[:headers]    = headers #from RallyAPI::CustomHttpHeader.new()
 		config[:projectScopeUp] = false
 		config[:projectScopeDown] = false
@@ -36,11 +48,12 @@ class Query
 	   result = @rally.find(query);
 	   
 	   if(result.length>0)
-	   	puts "result found for #{query.query_string}"
+	   	puts "Result found for #{string}"
+	  # 	puts "result found for #{query.query_string}"
 	     return result
 	   else
+	   	puts "No result for #{string}"
 	   	#puts "No result for #{@project_name}"
-	     #puts "No result"
 	   end  
 	end
 
@@ -52,4 +65,3 @@ class Query
 		return @rally
 	end
 end
-
